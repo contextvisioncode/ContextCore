@@ -1,9 +1,9 @@
-import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs-extra';
-import unzipper from 'unzipper';
-import { analyzeRepository } from '../services/analyzer.js';
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs-extra');
+const unzipper = require('unzipper');
+const { processRepository } = require('../workers/ingestion');
 
 const router = express.Router();
 
@@ -51,12 +51,13 @@ router.post('/zip', upload.single('file'), async (req, res) => {
         await fs.remove(zipPath);
 
         // Analyze extracted project
-        const result = await analyzeRepository(extractPath, projectId);
+        const zipBuffer = await fs.readFile(zipPath);
+        await processRepository(projectId, null, zipBuffer);
 
         // Clean up extracted files after analysis
         await fs.remove(extractPath);
 
-        res.json({ success: true, projectId, ...result });
+        res.json({ success: true, projectId, message: 'Processing started' });
     } catch (error) {
         console.error('ZIP upload error:', error);
         res.status(500).json({ error: error.message });
@@ -80,16 +81,16 @@ router.post('/snippet', async (req, res) => {
         await fs.writeFile(snippetPath, code);
 
         // Analyze the snippet (simplified analysis)
-        const result = await analyzeRepository(tempDir, projectId);
+        await processRepository(projectId, null, null);
 
         // Clean up
         await fs.remove(tempDir);
 
-        res.json({ success: true, projectId, ...result });
+        res.json({ success: true, projectId, message: 'Processing started' });
     } catch (error) {
         console.error('Snippet analysis error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-export default router;
+module.exports = router;
