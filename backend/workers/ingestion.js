@@ -52,18 +52,21 @@ async function processRepository(projectId, repoUrl, zipBuffer = null) {
             absolute: true
         });
 
-        // 4. Generate Context XML
-        let xmlContent = "<repository>\n";
+        // 4. Generate Context XML (Structured & Optimized)
+        const { generateStructuredXML } = require("../services/contextOptimizer");
+
+        const fileObjects = [];
         for (const filePath of entries) {
             const relativePath = path.relative(workDir, filePath);
             try {
                 const content = fs.readFileSync(filePath, "utf8");
-                xmlContent += `  <file path="${relativePath}">\n<![CDATA[\n${content}\n]]>\n  </file>\n`;
+                fileObjects.push({ path: relativePath, content });
             } catch (err) {
                 console.warn(`Skipping file ${relativePath}: ${err.message}`);
             }
         }
-        xmlContent += "</repository>";
+
+        const xmlContent = generateStructuredXML(fileObjects);
 
         // 5. Upload XML to Supabase Storage
         const storagePath = `${projectId}/context.xml`;
@@ -77,7 +80,27 @@ async function processRepository(projectId, repoUrl, zipBuffer = null) {
         console.log("🤖 Generating graph with Gemini 2.5 Flash...");
 
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const prompt = `Analise a arquitetura do código abaixo. Retorne APENAS um JSON válido com a estrutura { "nodes": [{ "id": "...", "position": { "x": 0, "y": 0 }, "data": { "label": "..." }, "type": "default", "style": { "background": "#1e293b", "color": "#fff" } }], "edges": [{ "id": "...", "source": "...", "target": "...", "animated": false }] } representando o fluxo de dados e dependências principais. Use cores dark mode (#1e293b para nodes, #6366f1 para edges principais). Não inclua markdown ou explicações. \n\nCódigo:\n${xmlContent.substring(0, 1000000)}`;
+        const prompt = `Analise a arquitetura do código abaixo. Retorne APENAS um JSON válido representando um GRAFO HIERÁRQUICO.
+        
+        Estrutura do JSON:
+        {
+          "nodes": [
+            { "id": "group_core", "type": "group", "data": { "label": "Core Logic" }, "position": { "x": 0, "y": 0 }, "style": { "width": 600, "height": 600, "backgroundColor": "rgba(30, 41, 59, 0.5)" } },
+            { "id": "node_1", "parentNode": "group_core", "extent": "parent", "data": { "label": "Server.js" }, "position": { "x": 50, "y": 50 }, "type": "default" }
+          ],
+          "edges": [
+            { "id": "e1-2", "source": "node_1", "target": "node_2", "animated": true }
+          ]
+        }
+
+        REGRAS:
+        1. Identifique os principais MÓDULOS ou PASTAS (ex: Backend, Frontend, Utils, Services) e crie nós do tipo "group" para eles.
+        2. Coloque os arquivos/classes dentro desses grupos usando a propriedade "parentNode".
+        3. Use cores vibrantes para os grupos (ex: rgba(99, 102, 241, 0.2) para backend, rgba(16, 185, 129, 0.2) para frontend).
+        4. NÃO inclua markdown. Apenas JSON puro.
+
+        Código:
+        ${xmlContent.substring(0, 1000000)}`;
 
         let graphJson = null;
         const maxRetries = 3;

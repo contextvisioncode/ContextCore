@@ -34,6 +34,7 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
     const [showBoot, setShowBoot] = useState(true);
     const [summary, setSummary] = useState<string | null>(null);
     const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+    const [isGraphMode, setIsGraphMode] = useState(false);
 
     // React Flow State
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -160,7 +161,7 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
             <div className="relative w-full h-full flex">
 
                 {/* Layer 0: The Universe (Graph Background) */}
-                <div className="absolute inset-0 z-0 opacity-20 pointer-events-auto">
+                <div className={`absolute inset-0 z-0 transition-all duration-500 ${isGraphMode ? 'opacity-100 z-50 bg-slate-900/90 backdrop-blur-sm' : 'opacity-20 pointer-events-auto'}`}>
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}
@@ -172,11 +173,24 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
                         maxZoom={2}
                     >
                         <Background color="#6366f1" gap={50} size={1} />
+                        <Controls />
                     </ReactFlow>
+
+                    {/* Graph Mode Controls */}
+                    {isGraphMode && (
+                        <div className="absolute top-4 right-4 z-50">
+                            <button
+                                onClick={() => setIsGraphMode(false)}
+                                className="bg-red-500/20 hover:bg-red-500/40 text-red-200 border border-red-500/50 px-4 py-2 rounded-lg backdrop-blur-md transition-all font-mono text-xs uppercase tracking-widest flex items-center gap-2"
+                            >
+                                Close Map View
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Layer 1: Mission Control Interface */}
-                <div className="relative z-10 w-full h-full flex p-6 gap-6 pointer-events-none">
+                <div className={`relative z-10 w-full h-full flex p-6 gap-6 pointer-events-none transition-all duration-500 ${isGraphMode ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
 
                     {/* Left Column: System Status (20%) */}
                     <div className="w-[20%] flex flex-col gap-6 pointer-events-auto">
@@ -191,6 +205,18 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
                         </div>
 
                         <ProjectDNA nodes={nodes} edges={edges} />
+
+                        {/* Map Toggle Button */}
+                        <button
+                            onClick={() => setIsGraphMode(true)}
+                            className="bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 p-3 rounded-xl text-left group transition-all"
+                        >
+                            <div className="text-xs font-mono text-indigo-300 mb-1 group-hover:text-indigo-200">VIEW MODE</div>
+                            <div className="text-sm font-bold text-white flex items-center justify-between">
+                                ARCHITECTURE MAP
+                                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+                            </div>
+                        </button>
 
                         <div className="mt-auto bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4">
                             <h3 className="text-xs font-mono text-gray-500 mb-2">CONNECTION STATUS</h3>

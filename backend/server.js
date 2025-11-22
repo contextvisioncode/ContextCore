@@ -78,13 +78,45 @@ app.post("/api/chat", async (req, res) => {
         console.log("🤖 Chat with Gemini 2.5 Flash activated...");
 
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const systemPrompt = `Você é o ContextCore. Use o XML abaixo como memória total do código. Responda como um Arquiteto de Software Sênior. Seja técnico, preciso e conciso.\n\nCONTEXTO:\n${xmlContext}`;
+        const systemPrompt = `Você é o ContextCore, um Arquiteto de Software Sênior especializado em análise de código.
+        
+SUA MISSÃO:
+Analisar o código fornecido no XML abaixo e responder às perguntas do usuário com extrema precisão técnica.
+
+REGRAS DE CONTEXTO:
+1. O código está no formato XML estruturado: <codebase_context><files><file path="...">...</file></files></codebase_context>.
+2. Cada linha de código possui um número de linha no formato "N: linha".
+
+REGRAS DE RESPOSTA (VIBE CODING):
+1. CITAÇÃO OBRIGATÓRIA: Sempre que citar um trecho de código, você DEVE indicar o arquivo e as linhas.
+   Exemplo: "A função processData em \`src/utils.js\` (linhas 10-15) realiza..."
+2. DIDÁTICA: Explique o "porquê" das decisões arquiteturais.
+3. VISUAL: Use markdown, listas e blocos de código para facilitar a leitura.
+
+CONTEXTO TOTAL:
+${xmlContext}`;
+
+        // History Compaction Logic (Simple Strategy: Summarize if > 10 turns)
+        let activeHistory = history || [];
+        if (activeHistory.length > 10) {
+            // Keep system prompt (implied by startChat) + last 4 messages
+            // Summarize the rest (TODO: Implement actual LLM summarization here for V2)
+            // For now, we just truncate to keep the most recent context which is usually most relevant for coding
+            const keptHistory = activeHistory.slice(-4);
+
+            // Add a "system" note about truncation (simulated as model thought)
+            activeHistory = [
+                { role: "user", parts: [{ text: "[SISTEMA: Histórico anterior resumido para focar no contexto atual]" }] },
+                { role: "model", parts: [{ text: "Entendido. Focando nas últimas interações." }] },
+                ...keptHistory
+            ];
+        }
 
         const chat = model.startChat({
             history: [
                 { role: "user", parts: [{ text: systemPrompt }] },
-                { role: "model", parts: [{ text: "Entendido. Estou pronto para analisar o código." }] },
-                ...(history || [])
+                { role: "model", parts: [{ text: "Entendido. Análise carregada com sucesso. Aguardando comandos." }] },
+                ...activeHistory
             ]
         });
 

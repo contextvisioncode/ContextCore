@@ -41,7 +41,7 @@ export default function LoginPage() {
                     password,
                 });
                 if (error) throw error;
-                router.push("/");
+                router.push("/upload");
                 router.refresh();
             }
         } catch (err: any) {
@@ -57,7 +57,7 @@ export default function LoginPage() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider,
                 options: {
-                    redirectTo: `${location.origin}/auth/callback`,
+                    redirectTo: `${location.origin}/auth/callback?next=/upload`,
                 },
             });
             if (error) throw error;
