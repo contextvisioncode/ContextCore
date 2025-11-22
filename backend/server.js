@@ -15,6 +15,10 @@ app.use(express.json({ limit: "50mb" }));
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Import upload routes
+const uploadRoutes = require("./routes/upload");
+const snippetRoutes = require("./routes/snippet");
+
 // --- Endpoints ---
 
 // 1. Trigger Ingestion
@@ -44,6 +48,12 @@ app.post("/api/ingest", async (req, res) => {
 
     res.json({ message: "Ingestion started", projectId });
 });
+
+// Register upload routes for ZIP and Snippet
+app.use("/api/ingest", uploadRoutes);
+
+// Register snippet analysis routes
+app.use("/api/snippet", snippetRoutes);
 
 // 2. Chat API (Streaming) - Real Gemini 2.5 Flash
 app.post("/api/chat", async (req, res) => {
