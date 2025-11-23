@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Github, Lock, Zap, ShieldCheck, Eye, Cpu, Activity, Server, Code2, ChevronRight, LogIn, UserPlus, Target, Radar, Brain, Sparkles, FileCode, FileText, X } from "lucide-react";
+import { Github, Lock, Zap, ShieldCheck, Eye, Cpu, Activity, Server, Code2, ChevronRight, LogIn, UserPlus, Target, Radar, Brain, Sparkles, FileCode, FileText, X, MousePointer2, Wind, Heart, Share2, Bot } from "lucide-react";
 import { AuroraBackground } from "@/components/ui/AuroraBackground";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
@@ -81,10 +81,10 @@ export default function HomePage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Snippet Mode Link */}
+            {/* Snippet Mode Link - Hidden */}
             <button
               onClick={handleSnippetMode}
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600/10 hover:bg-purple-600/20 border border-purple-500/30 hover:border-purple-500/50 transition-all text-sm font-medium text-purple-300"
+              className="hidden"
             >
               <FileCode className="w-4 h-4" />
               Snippet Mode
@@ -175,68 +175,56 @@ export default function HomePage() {
 
             <button
               onClick={handleSnippetMode}
-              className="h-14 px-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/30 text-white font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl"
+              className="hidden"
             >
               <FileCode className="w-5 h-5" />
               <span>Paste Snippet</span>
             </button>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Universal Ecosystem Compatibility Strip */}
-      <section className="py-8 relative z-10 bg-[#030712] border-b border-white/5">
-        <div className="max-w-6xl mx-auto px-4 text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-gray-400">
-            <Sparkles className="w-3 h-3 text-indigo-400" />
-            UNIVERSAL COMPATIBILITY
-          </div>
-
-          <h3 className="text-xl md:text-2xl font-bold text-white">
-            Write Once, Deploy Everywhere.
-          </h3>
-          <p className="text-sm text-gray-400 max-w-xl mx-auto">
-            Your optimized prompts work natively inside your favorite environments.
-          </p>
-
-          {/* Icon Grid */}
-          <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
-            {[
-              { name: "GitHub", icon: "github" },
-              { name: "Google AI Studio", icon: "google" },
-              { name: "VS Code", icon: "visualstudiocode" },
-              { name: "Cursor", icon: "cursor" },
-              { name: "Windsurf", icon: "codeium" },
-              { name: "Replit", icon: "replit" },
-              { name: "Bolt.new", icon: "stackblitz" },
-              { name: "Lovable", icon: "v0" },
-              { name: "Claude", icon: "anthropic" }
-            ].map((platform, i) => (
-              <motion.div
-                key={platform.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05, duration: 0.3 }}
-                className="group relative"
-              >
-                {/* Tooltip */}
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg bg-black/90 border border-white/20 text-xs font-semibold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                  Optimized for {platform.name}
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-black/90 border-r border-b border-white/20 rotate-45" />
+          {/* Ecosystem Icons Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="pt-12"
+          >
+            <div className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
+              {[
+                { name: "Cursor", icon: MousePointer2, color: "text-black" },
+                { name: "Windsurf", icon: Wind, color: "text-blue-500" },
+                { name: "Trae", icon: Cpu, color: "text-indigo-500" },
+                { name: "Bolt.new", icon: Zap, color: "text-yellow-500" },
+                { name: "Lovable", icon: Heart, color: "text-pink-500" },
+                { name: "Replit", src: "https://cdn.simpleicons.org/replit/F26207" },
+                { name: "v0", src: "https://cdn.simpleicons.org/vercel/000000" },
+                { name: "VS Code", src: "https://cdn.simpleicons.org/visualstudiocode/007ACC" },
+                { name: "Cline", icon: Bot, color: "text-green-500" },
+                { name: "Dyad", icon: Share2, color: "text-purple-500" },
+                { name: "Outra IDE", icon: Code2, color: "text-gray-600" }
+              ].map((tool: any) => (
+                <div
+                  key={tool.name}
+                  className="group relative flex flex-col items-center gap-2"
+                >
+                  <div className="w-12 h-12 rounded-full bg-white border border-white/10 flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
+                    {tool.src ? (
+                      <img
+                        src={tool.src}
+                        alt={tool.name}
+                        className="w-6 h-6"
+                      />
+                    ) : (
+                      <tool.icon className={`w-6 h-6 ${tool.color}`} />
+                    )}
+                  </div>
+                  <span className="text-[10px] font-medium text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-6 whitespace-nowrap">
+                    {tool.name}
+                  </span>
                 </div>
-
-                {/* Icon Container */}
-                <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:border-white/30 transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-indigo-500/30">
-                  <img
-                    src={`https://cdn.simpleicons.org/${platform.icon}`}
-                    alt={platform.name}
-                    className="w-7 h-7 opacity-80 group-hover:opacity-100 transition-all duration-300 drop-shadow-lg"
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -350,7 +338,7 @@ export default function HomePage() {
                   </p>
                   <button
                     onClick={handleSnippetMode}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-300 font-semibold text-sm transition-all"
+                    className="hidden"
                   >
                     Try Snippet Mode <ChevronRight className="w-4 h-4" />
                   </button>
@@ -432,10 +420,10 @@ export default function HomePage() {
 
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Stats Bar - Compact Social Proof */}
-      <section className="py-8 relative z-10 border-y border-white/5 bg-gradient-to-r from-[#030712] via-indigo-950/10 to-[#030712]">
+      < section className="py-8 relative z-10 border-y border-white/5 bg-gradient-to-r from-[#030712] via-indigo-950/10 to-[#030712]" >
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <StatCard label="Lines Analyzed" value="10M+" />
@@ -444,10 +432,10 @@ export default function HomePage() {
             <StatCard label="Encryption" value="AES-256" />
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Final CTA - Compact */}
-      <section className="py-16 text-center relative z-10 bg-[#030712] border-t border-white/5">
+      < section className="py-16 text-center relative z-10 bg-[#030712] border-t border-white/5" >
         <div className="max-w-2xl mx-auto px-4 space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold">Ready to See the Invisible?</h2>
           <p className="text-gray-400">Join developers analyzing 10M+ lines of code daily.</p>
@@ -458,52 +446,54 @@ export default function HomePage() {
             Start Free Analysis <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-      </section>
+      </section >
 
       {/* Footer */}
-      <footer className="py-8 border-t border-white/5 text-center text-gray-600 text-sm relative z-10">
+      < footer className="py-8 border-t border-white/5 text-center text-gray-600 text-sm relative z-10" >
         <p>© 2025 ContextCode. All systems operational.</p>
-      </footer>
+      </footer >
 
       {/* White Paper Modal */}
       <AnimatePresence>
-        {showWhitePaper && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
-            onClick={() => setShowWhitePaper(false)}
-          >
+        {
+          showWhitePaper && (
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              className="relative max-w-6xl w-full max-h-[90vh] bg-[#030712] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+              onClick={() => setShowWhitePaper(false)}
             >
-              {/* Close Button */}
-              <button
-                onClick={() => setShowWhitePaper(false)}
-                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 flex items-center justify-center transition-all hover:scale-110"
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", duration: 0.5 }}
+                className="relative max-w-6xl w-full max-h-[90vh] bg-[#030712] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
               >
-                <X className="w-5 h-5 text-white" />
-              </button>
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowWhitePaper(false)}
+                  className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 flex items-center justify-center transition-all hover:scale-110"
+                >
+                  <X className="w-5 h-5 text-white" />
+                </button>
 
-              {/* White Paper Image */}
-              <div className="overflow-auto max-h-[90vh]">
-                <img
-                  src="https://files.catbox.moe/mijjte.png"
-                  alt="ContextCode White Paper"
-                  className="w-full h-auto"
-                />
-              </div>
+                {/* White Paper Image */}
+                <div className="overflow-auto max-h-[90vh]">
+                  <img
+                    src="https://files.catbox.moe/mijjte.png"
+                    alt="ContextCode White Paper"
+                    className="w-full h-auto"
+                  />
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          )
+        }
+      </AnimatePresence >
+    </div >
   );
 }
 

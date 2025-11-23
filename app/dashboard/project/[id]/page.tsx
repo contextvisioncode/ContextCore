@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect, use, useCallback } from "react";
-import ReactFlow, {
-    Background,
-    Controls,
+import {
     useNodesState,
     useEdgesState,
     Node
@@ -17,6 +15,8 @@ import { ProjectDNA } from "@/components/dashboard/ProjectDNA";
 import { NeuralChat } from "@/components/dashboard/NeuralChat";
 import { IntelligenceBriefing } from "@/components/dashboard/IntelligenceBriefing";
 import { TacticalGrid } from "@/components/dashboard/TacticalGrid";
+import { ArchitectureMap } from "@/components/dashboard/ArchitectureMap";
+import { MissionGuide } from "@/components/dashboard/MissionGuide";
 import { motion, AnimatePresence } from "framer-motion";
 
 // --- Types ---
@@ -165,40 +165,22 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
 
     return (
         <AuroraBackground className="h-screen w-full overflow-hidden">
+            <MissionGuide />
             <div className="relative w-full h-full flex">
 
                 {/* Layer 0: The Universe (Graph Background) */}
-                <div className={`absolute inset-0 z-0 transition-all duration-500 ${isGraphMode ? 'opacity-100 z-50 bg-slate-900/90 backdrop-blur-sm' : 'opacity-20 pointer-events-auto'}`}>
-                    <ReactFlow
-                        nodes={nodes}
-                        edges={edges}
-                        onNodesChange={onNodesChange}
-                        onEdgesChange={onEdgesChange}
+                <div className={`absolute inset-0 z-0 transition-all duration-500 ${isGraphMode ? 'opacity-100 z-50 bg-slate-900/95 backdrop-blur-sm' : 'opacity-20 pointer-events-auto'}`}>
+                    <ArchitectureMap
+                        initialNodes={nodes}
+                        initialEdges={edges}
                         onNodeClick={onNodeClick}
-                        fitView
-                        className="bg-transparent"
-                        minZoom={0.1}
-                        maxZoom={2}
-                    >
-                        <Background color="#6366f1" gap={50} size={1} />
-                        <Controls />
-                    </ReactFlow>
-
-                    {/* Graph Mode Controls */}
-                    {isGraphMode && (
-                        <div className="absolute top-4 right-4 z-50">
-                            <button
-                                onClick={() => setIsGraphMode(false)}
-                                className="bg-red-500/20 hover:bg-red-500/40 text-red-200 border border-red-500/50 px-4 py-2 rounded-lg backdrop-blur-md transition-all font-mono text-xs uppercase tracking-widest flex items-center gap-2"
-                            >
-                                Close Map View
-                            </button>
-                        </div>
-                    )}
+                        isFullScreen={isGraphMode}
+                        onToggleFullScreen={() => setIsGraphMode(!isGraphMode)}
+                    />
 
                     {/* Node Details Modal */}
                     <AnimatePresence>
-                        {selectedNode && (
+                        {selectedNode && isGraphMode && (
                             <motion.div
                                 initial={{ x: 300, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
@@ -221,7 +203,7 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
                                 <div className="space-y-6">
                                     <div>
                                         <label className="text-[10px] uppercase tracking-widest text-gray-500 font-mono">Component Name</label>
-                                        <h3 className="text-xl font-bold text-white mt-1">{selectedNode.data.label}</h3>
+                                        <h3 className="text-xl font-bold text-white mt-1 break-all">{selectedNode.data.label}</h3>
                                     </div>
 
                                     <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
@@ -232,8 +214,10 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
                                         <p className="text-xs text-gray-300 leading-relaxed">
                                             This component appears to be a critical part of the system architecture.
                                             Based on its connections, it likely handles data flow between
-                                            {edges.filter(e => e.source === selectedNode.id).length} downstream nodes and
-                                            {edges.filter(e => e.target === selectedNode.id).length} upstream dependencies.
+                                            <span className="text-white font-bold mx-1">{edges.filter(e => e.source === selectedNode.id).length}</span>
+                                            downstream nodes and
+                                            <span className="text-white font-bold mx-1">{edges.filter(e => e.target === selectedNode.id).length}</span>
+                                            upstream dependencies.
                                         </p>
                                     </div>
 
@@ -271,10 +255,13 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
                             </div>
                         </div>
 
-                        <ProjectDNA nodes={nodes} edges={edges} />
+                        <div id="mission-dna">
+                            <ProjectDNA nodes={nodes} edges={edges} />
+                        </div>
 
                         {/* Map Toggle Button */}
                         <button
+                            id="mission-map-toggle"
                             onClick={() => setIsGraphMode(true)}
                             className="bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 p-3 rounded-xl text-left group transition-all"
                         >
@@ -306,13 +293,15 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
 
                     {/* Center Column: Intelligence & Tactics (50%) */}
                     <div className="w-[50%] flex flex-col gap-6 pointer-events-auto overflow-y-auto pr-2 scrollbar-none">
-                        <IntelligenceBriefing
-                            summary={summary}
-                            onGenerate={handleGenerateBriefing}
-                            isGenerating={isGeneratingSummary}
-                        />
+                        <div id="mission-briefing">
+                            <IntelligenceBriefing
+                                summary={summary}
+                                onGenerate={handleGenerateBriefing}
+                                isGenerating={isGeneratingSummary}
+                            />
+                        </div>
 
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-4" id="mission-tactics">
                             <div className="flex items-center gap-2 border-b border-white/10 pb-2">
                                 <div className="w-2 h-2 bg-cyan-500 rotate-45" />
                                 <h2 className="font-mono text-sm font-bold text-white tracking-widest">TACTICAL OPERATIONS</h2>
@@ -322,7 +311,7 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
                     </div>
 
                     {/* Right Column: Neural Link (30%) */}
-                    <div className="w-[30%] h-full pointer-events-auto">
+                    <div className="w-[30%] h-full pointer-events-auto" id="mission-chat">
                         <div className="h-full rounded-2xl overflow-hidden border border-white/10 bg-black/20 backdrop-blur-md shadow-2xl">
                             <NeuralChat
                                 messages={messages}

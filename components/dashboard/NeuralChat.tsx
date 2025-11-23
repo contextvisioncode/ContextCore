@@ -207,7 +207,7 @@ export const NeuralChat = ({
             </div>
 
             {/* Prompt Enhancer Toolbar */}
-            <div className="px-4 py-2 bg-black/30 border-t border-white/5 flex items-center justify-between gap-3">
+            <div id="mission-chat-export" className="px-4 py-2 bg-black/30 border-t border-white/5 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider">Target IDE:</span>
                     <select
@@ -245,7 +245,7 @@ export const NeuralChat = ({
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t border-white/10 bg-black/20">
+            <div id="mission-chat-input" className="p-4 border-t border-white/10 bg-black/20">
                 <div className="relative flex items-center">
                     <input
                         value={input}

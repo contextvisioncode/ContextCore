@@ -18,6 +18,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // Import upload routes
 const uploadRoutes = require("./routes/upload");
 const snippetRoutes = require("./routes/snippet");
+const snippetsManagementRoutes = require("./routes/snippets");
 
 // --- Endpoints ---
 
@@ -54,6 +55,9 @@ app.use("/api/ingest", uploadRoutes);
 
 // Register snippet analysis routes
 app.use("/api/snippet", snippetRoutes);
+
+// Register snippets management routes (CRUD)
+app.use("/api/snippets", snippetsManagementRoutes);
 
 // 2. Chat API (Streaming) - Real Gemini 2.5 Flash
 app.post("/api/chat", async (req, res) => {

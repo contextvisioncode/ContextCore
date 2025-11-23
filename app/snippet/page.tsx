@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileCode, Send, Sparkles, AlertCircle, Loader2 } from "lucide-react";
+import { FileCode, Send, Sparkles, AlertCircle, Loader2, Save, FolderOpen } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import MonacoEditor from "@/components/editor/MonacoEditor";
 
 const EXAMPLE_CODE = `function fibonacci(n) {
   if (n <= 1) return n;
@@ -67,17 +68,17 @@ export default function SnippetPage() {
                 body: JSON.stringify({ code, language }),
             });
 
-            if (!res.ok) {
-                throw new Error("Analysis failed");
-            }
-
             const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.details || data.error || "Analysis failed");
+            }
 
             // Redirect to dashboard with chat
             router.push(`/dashboard/project/${data.projectId}`);
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            setError("Failed to analyze code. Please try again.");
+            setError(err.message || "Failed to analyze code. Please try again.");
             setIsAnalyzing(false);
         }
     };
@@ -141,25 +142,25 @@ export default function SnippetPage() {
                     <div className="relative">
                         <div className="flex items-center justify-between mb-2">
                             <label className="text-sm font-medium text-gray-400">Your Code</label>
-                            <button
-                                onClick={handleLoadExample}
-                                className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-                            >
-                                Load Example
-                            </button>
-                        </div>
-                        <div className="relative">
-                            <textarea
-                                value={code}
-                                onChange={(e) => setCode(e.target.value)}
-                                placeholder="Paste your code here..."
-                                rows={16}
-                                className="w-full px-4 py-3 rounded-xl bg-black/60 backdrop-blur-xl border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-white font-mono text-sm resize-none"
-                            />
-                            <div className="absolute bottom-3 right-3 text-xs text-gray-500 font-mono">
-                                {code.length} / 50,000 chars
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={handleLoadExample}
+                                    className="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
+                                >
+                                    <FileCode className="w-3.5 h-3.5" />
+                                    Load Example
+                                </button>
                             </div>
                         </div>
+                        <MonacoEditor
+                            value={code}
+                            onChange={setCode}
+                            language={language === "auto" ? "javascript" : language}
+                            height="500px"
+                            theme="vs-dark"
+                            minimap={true}
+                            showActions={true}
+                        />
                     </div>
 
                     {/* Error Display */}
