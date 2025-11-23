@@ -38,6 +38,14 @@ export default function HomePage() {
     }
   };
 
+  const handleSnippetMode = () => {
+    if (!user) {
+      router.push("/login");
+    } else {
+      router.push("/snippet");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#030712] text-white selection:bg-indigo-500/30">
 
@@ -74,7 +82,7 @@ export default function HomePage() {
           <div className="flex items-center gap-3">
             {/* Snippet Mode Link */}
             <button
-              onClick={() => router.push("/snippet")}
+              onClick={handleSnippetMode}
               className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600/10 hover:bg-purple-600/20 border border-purple-500/30 hover:border-purple-500/50 transition-all text-sm font-medium text-purple-300"
             >
               <FileCode className="w-4 h-4" />
@@ -156,7 +164,7 @@ export default function HomePage() {
             </button>
 
             <button
-              onClick={() => router.push("/snippet")}
+              onClick={handleSnippetMode}
               className="h-14 px-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/30 text-white font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl"
             >
               <FileCode className="w-5 h-5" />
@@ -331,7 +339,7 @@ export default function HomePage() {
                     Snippet Mode analyzes any code fragment instantly. AI generates deep context, architecture insights, and security assessments—even from a single function.
                   </p>
                   <button
-                    onClick={() => router.push("/snippet")}
+                    onClick={handleSnippetMode}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-300 font-semibold text-sm transition-all"
                   >
                     Try Snippet Mode <ChevronRight className="w-4 h-4" />

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileCode, Send, Sparkles, AlertCircle, Loader2 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 const EXAMPLE_CODE = `function fibonacci(n) {
   if (n <= 1) return n;
@@ -14,6 +15,7 @@ console.log(fibonacci(10));`;
 
 export default function SnippetPage() {
     const router = useRouter();
+    const supabase = createClient();
 
     const [code, setCode] = useState("");
     const [language, setLanguage] = useState("auto");
@@ -32,6 +34,17 @@ export default function SnippetPage() {
         { value: "rust", label: "Rust" },
         { value: "php", label: "PHP" },
     ];
+
+    // Check authentication on mount
+    useEffect(() => {
+        const checkAuth = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                router.push("/login");
+            }
+        };
+        checkAuth();
+    }, [router, supabase]);
 
     const handleAnalyze = async () => {
         if (!code.trim()) {
