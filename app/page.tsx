@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Github, Lock, Zap, ShieldCheck, Eye, Cpu, Activity, Server, Code2, ChevronRight, LogIn, UserPlus, Target, Radar, Brain, Sparkles, FileCode } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Github, Lock, Zap, ShieldCheck, Eye, Cpu, Activity, Server, Code2, ChevronRight, LogIn, UserPlus, Target, Radar, Brain, Sparkles, FileCode, FileText, X } from "lucide-react";
 import { AuroraBackground } from "@/components/ui/AuroraBackground";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ export default function HomePage() {
   const supabase = createClient();
   const [sessionId, setSessionId] = useState("INITIALIZING...");
   const [user, setUser] = useState<any>(null);
+  const [showWhitePaper, setShowWhitePaper] = useState(false);
 
   useEffect(() => {
     setSessionId(crypto.randomUUID().slice(0, 8));
@@ -56,7 +57,7 @@ export default function HomePage() {
             <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
               <Eye className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-lg">ContextVision</span>
+            <span className="font-bold text-lg">ContextCode</span>
 
             {/* System Status Indicator */}
             <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 border text-xs font-mono">
@@ -87,6 +88,15 @@ export default function HomePage() {
             >
               <FileCode className="w-4 h-4" />
               Snippet Mode
+            </button>
+
+            {/* White Paper Button */}
+            <button
+              onClick={() => setShowWhitePaper(true)}
+              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/30 hover:border-indigo-500/50 transition-all text-sm font-medium text-indigo-300"
+            >
+              <FileText className="w-4 h-4" />
+              White Paper
             </button>
             {user ? (
               <>
@@ -452,8 +462,47 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="py-8 border-t border-white/5 text-center text-gray-600 text-sm relative z-10">
-        <p>© 2025 ContextVisionCode. All systems operational.</p>
+        <p>© 2025 ContextCode. All systems operational.</p>
       </footer>
+
+      {/* White Paper Modal */}
+      <AnimatePresence>
+        {showWhitePaper && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+            onClick={() => setShowWhitePaper(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="relative max-w-6xl w-full max-h-[90vh] bg-[#030712] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowWhitePaper(false)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 flex items-center justify-center transition-all hover:scale-110"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+
+              {/* White Paper Image */}
+              <div className="overflow-auto max-h-[90vh]">
+                <img
+                  src="https://files.catbox.moe/mijjte.png"
+                  alt="ContextCode White Paper"
+                  className="w-full h-auto"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

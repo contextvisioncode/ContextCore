@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 // Load private key
-const privateKeyPath = path.resolve(process.env.GITHUB_PRIVATE_KEY_PATH || "contextvisioncode.private-key.pem");
+const privateKeyPath = path.resolve(process.env.GITHUB_PRIVATE_KEY_PATH || "contextcode.private-key.pem");
 let privateKey;
 try {
   privateKey = fs.readFileSync(privateKeyPath, "utf8");
@@ -28,12 +28,12 @@ async function getAuthenticatedCloneUrl(repoUrl) {
   try {
     const installationAuthentication = await auth({ type: "installation" });
     const token = installationAuthentication.token;
-    
+
     // Insert token into URL: https://x-access-token:TOKEN@github.com/owner/repo.git
     const urlObj = new URL(repoUrl);
     urlObj.username = "x-access-token";
     urlObj.password = token;
-    
+
     return urlObj.toString();
   } catch (error) {
     console.error("Error getting GitHub authentication:", error);
